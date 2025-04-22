@@ -95,7 +95,7 @@ function atualizarTabela() {
     linha.insertCell(3).innerText = venda.titular;
     linha.insertCell(4).innerText = venda.valorWallet.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     linha.insertCell(5).innerText = venda.desagio.toFixed(2);
-    linha.insertCell(6).innerText = venda.lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    linha.insertCell(6).innerText = (venda.lucro || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     const cellEmissor = linha.insertCell(7);
     cellEmissor.innerHTML = venda.emissor + (venda.status === 'Cancelado' ? ' <span style="color:red; font-weight:bold;">(Venda cancelada)</span>' : '');
     const acoes = linha.insertCell(8);
@@ -119,9 +119,11 @@ function registrarVenda() {
     alert('Preencha todos os campos corretamente.');
     return;
   }
-  const lucro = valorWallet - (valorWallet * (desagio / 100));
+  const custoWallet = valorWallet * 0.1003;
+  const lucro = receita - custoWallet;
   const cliente = document.getElementById('cliente').value;
-  vendas.push({ data, localizador, cliente, titular, valorWallet, desagio, lucro, emissor, status: 'Ativo' });
+  const receita = valorWallet - (valorWallet * (desagio / 100));
+  vendas.push({ data, localizador, cliente, titular, valorWallet, desagio, receita, custoWallet, lucro, emissor, status: 'Ativo' });
   atualizarTabela();
   document.getElementById('vendaForm').reset();
   document.getElementById('registrarBtn').style.display = 'inline-block';
@@ -152,7 +154,8 @@ function atualizarVenda() {
   const valorWallet = parseFloat(document.getElementById('valorWallet').value);
   const desagio = parseFloat(document.getElementById('desagio').value);
   const emissor = document.getElementById('emissor').value;
-  const lucro = valorWallet - (valorWallet * (desagio / 100));
+  const custoWallet = valorWallet * 0.1003;
+  const lucro = receita - custoWallet;
   const status = vendas[indiceEdicao].status || 'Ativo';
   const cliente = document.getElementById('cliente').value;
   vendas[indiceEdicao] = { data, localizador, cliente, titular, valorWallet, desagio, lucro, emissor, status };
